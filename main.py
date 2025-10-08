@@ -83,3 +83,36 @@ def register(request: RegisterRequest):
         return {"message": "User registered successfully", "user": user.user}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+
+# ----- Get User by ID -----
+@app.get("/user/{user_id}")
+def get_user(user_id: str):
+    try:
+        user = supabase.auth.admin.get_user_by_id(user_id)
+        if user and user.user:
+            return {"user": user.user}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+# ----- Update User by ID -----
+@app.put("/user/{user_id}")
+def update_user(user_id: str, request: RegisterRequest):
+    try:
+        user = supabase.auth.admin.update_user_by_id(
+            user_id,
+            {
+                "email": request.email,
+                "password": request.password,
+            },
+        )
+        if user and user.user:
+            return {"message": "User updated successfully", "user": user.user}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+
